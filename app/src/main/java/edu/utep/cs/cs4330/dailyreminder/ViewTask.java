@@ -21,12 +21,12 @@ public class ViewTask extends AppCompatActivity {
         setContentView(R.layout.activity_view_task);
 
 
-        toolbar_title = (TextView) findViewById(R.id.toolbar_title);
+//        toolbar_title = (TextView) findViewById(R.id.toolbar_title);
         dueDate = (TextView) findViewById(R.id.dueDate);
 
         String taskTitle = getIntent().getStringExtra("Title");
         String taskDate = getIntent().getStringExtra("Date");
-        toolbar_title.setText(taskTitle);
+//        toolbar_title.setText(taskTitle);
         dueDate.setText(taskDate);
 
     }

@@ -17,9 +17,13 @@ import android.support.v7.widget.Toolbar;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Objects;
 import java.util.Random;
 
+import edu.utep.cs.cs4330.dailyreminder.Models.DatabaseHelper;
 import edu.utep.cs.cs4330.dailyreminder.Models.Task;
+
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -27,18 +31,24 @@ public class MainActivity extends AppCompatActivity {
     public TaskAdapter taskAdapter;
     private EditText filter;
     private Toolbar toolbar;
+    DatabaseHelper db;
     ListView taskView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Windows Operations
-        windowOperations();
+        // Toolbar and Full Screen
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
+
+
+        //DB
+        db = new DatabaseHelper(this);
 
         // Content View
         setContentView(R.layout.activity_main);
-
 
         // Fill List
         this.tasks = dummyFill(15);
@@ -80,6 +90,19 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onPrepareOptionsMenu(final Menu menu) {
+        getMenuInflater().inflate(R.menu.newmenu, menu);
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.newmenu, menu);
+        return true;
+    }
+
     public ArrayList<Task> dummyFill(int n){
         ArrayList<Task> tmp = new ArrayList<Task>();
         Date currentTime = Calendar.getInstance().getTime();
@@ -101,13 +124,6 @@ public class MainActivity extends AppCompatActivity {
         return tmp;
     }
 
-    // Create Menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu){
-        getMenuInflater().inflate(R.menu.newmenu, menu);
-        return true;
-    }
-
     public void itemClicked(int position){
         Intent taskIntent = new Intent(this, ViewTask.class);
 //        String itemDataAsString = gson.toJson(itm.getList()); // Serialize Object to pass it
@@ -118,13 +134,4 @@ public class MainActivity extends AppCompatActivity {
         startActivity(taskIntent);
     }
 
-    public void windowOperations(){
-        // Full Screen
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        // New ToolBar
-        this.toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(this.toolbar);
-    }
 }
