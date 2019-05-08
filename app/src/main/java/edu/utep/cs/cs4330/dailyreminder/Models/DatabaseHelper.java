@@ -6,11 +6,13 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.Date;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "tasks.db";
     private static final String TABLE_NAME = "tasks_items";
-    private static final String[] COL = {"t_id", "t_name", "i_date_created", "i_date_end", "i_priority", "t_file_1, t_file_2"};
+    private static final String[] COL = {"t_id", "t_name", "i_date_created", "i_date_end", "i_priority", "t_file_1", "t_file_2", "t_description"};
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -18,7 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table "+ TABLE_NAME +" (t_id INTEGER PRIMARY KEY AUTOINCREMENT, t_name TEXT, i_date_created TEXT, i_date_end TEXT, i_priority INTEGER, t_file_1 FLOAT,  t_file_2 FLOAT )");
+        db.execSQL("create table "+ TABLE_NAME +" (t_id INTEGER PRIMARY KEY AUTOINCREMENT, t_name TEXT, i_date_created TEXT, i_date_end TEXT, i_priority INTEGER, t_file_1 FLOAT,  t_file_2 FLOAT, t_description FLOAT )");
     }
 
     @Override
@@ -27,15 +29,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertData(String name, String date_created, String date_end, String priority, String file1, String file2) {
+    public boolean insertData(String name, Date date_created, Date date_end, int priority, String file1, String file2, String description) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COL[1], name);
-        contentValues.put(COL[2], date_created);
-        contentValues.put(COL[3], date_end);
+        contentValues.put(COL[2], String.valueOf(date_created));
+        contentValues.put(COL[3], String.valueOf(date_end));
         contentValues.put(COL[4], priority);
         contentValues.put(COL[5], file1);
         contentValues.put(COL[6], file2);
+        contentValues.put(COL[7], description);
         long result = db.insert(TABLE_NAME, null, contentValues);
         return result != -1;
     }

@@ -16,7 +16,6 @@
         android:text="TextView"
         android:textAllCaps="false"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        android:textColor="@color/titleTask"
         android:textSize="22sp"
         app:layout_constraintStart_toEndOf="@+id/productIcon"
         app:layout_constraintTop_toTopOf="parent"

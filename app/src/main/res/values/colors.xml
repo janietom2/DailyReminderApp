@@ -3,7 +3,5 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
-    <color name="backgroundColor">#FFE9D6</color>
-    <color name="textColor">#000000</color>
-    <color name="titleTask">#9E8874</color>
 </resources>
+

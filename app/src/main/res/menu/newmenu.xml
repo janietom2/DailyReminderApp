@@ -4,9 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
     <item
-        android:id="@+id/media_route_menu_item"
-        android:title="Cast"
-        app:actionProviderClass="android.support.v7.app.MediaRouteActionProvider"
-        tools:icon="@drawable/mr_button_light" />
-    <item android:title="Add" />
+        android:id="@+id/addTask"
+        android:icon="@android:drawable/ic_input_add"
+        android:title="Add"
+        android:visible="true" />
+
+    <item
+        android:id="@+id/searchButton"
+        android:icon="@drawable/ic_search_black_24dp"
+        android:title="Search"
+        app:actionViewClass="android.widget.SearchView" />
 </menu>

@@ -6,14 +6,18 @@ public class Task {
 
     private String title;
     private String description;
+    private Date startDate;
     private File[] files;
     private Date deadLine;
+    private String id;
 
-    public Task(String title, String description, Date deadLine, int priority) {
+    public Task(String title, String description,Date startDate, Date deadLine, int priority, String id) {
         this.title = title;
         this.description = description;
         this.deadLine = deadLine;
         this.priority = priority;
+        this.startDate = startDate;
+        this.id = id;
     }
 
     private int priority;
