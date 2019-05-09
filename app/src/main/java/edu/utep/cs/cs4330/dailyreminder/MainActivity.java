@@ -255,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         this.tasks.add(t);
         this.taskAdapter.addItem(t); // Add to adapter (To be able to filter it)
         this.taskAdapter.notifyDataSetChanged();
+        reSort();
     }
 
     private ArrayList<Task> loadFromDB(){
@@ -281,16 +282,18 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     response.getString(0),
                     Integer.valueOf(response.getString(8)));
 
-            if(response.getString(4) == "0"){
+            if(response.getString(4).equals("0")){
                 red.add(tmp);
-            } else if (response.getString(4) == "0"){
+            } else if (response.getString(4).equals("1")){
                 purple.add(tmp);
             } else{
-                blue.a
+                blue.add(tmp);
             }
-
-            tks.add(tmp);
         }
+
+        tks.addAll(red);
+        tks.addAll(purple);
+        tks.addAll(blue);
 
         return tks;
     }
@@ -302,6 +305,24 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         this.tasks.remove(t);
         this.taskAdapter.removeItem(position);
         taskAdapter.notifyDataSetChanged();
+    }
+
+
+    private void reSort(){
+        this.tasks = loadFromDB();
+
+        // Variables
+        ArrayList<Task> tmp   = new ArrayList<Task>();
+        this.filter           = findViewById(R.id.searchFilter);
+
+        // Set visibility of search bar off from the beginning
+        this.filter.setVisibility(View.VISIBLE);
+
+        // Set Tasks Adapter (ListView)
+        this.taskView = findViewById(R.id.items_list);
+        this.taskAdapter = new TaskAdapter(this, tasks);
+        this.taskView.setAdapter(taskAdapter);
+        this.taskView.setTextFilterEnabled(true);
     }
 
     @Override
