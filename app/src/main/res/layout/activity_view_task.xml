@@ -5,12 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:fontFamily="@font/roboto_thin"
+    android:background="#FFE9D6"
     tools:context=".ViewTask">
 
     <TextView
         android:id="@+id/taskName"
         android:layout_width="426dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:fontFamily="@font/roboto_condensed_bold"
         android:text="TextView"
         android:textAlignment="center"
         android:textSize="30sp"
@@ -19,13 +23,17 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_marginTop="50dp"
+        android:orientation="horizontal"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
 
         <TextView
             android:id="@+id/textView5"
-            android:layout_width="0dp"
+            android:layout_width="45dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:fontFamily="@font/roboto"
             android:text="Due Date:"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -44,13 +52,17 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_marginTop="25dp"
+        android:orientation="horizontal"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
 
         <TextView
             android:id="@+id/textView6"
-            android:layout_width="0dp"
+            android:layout_width="41dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:fontFamily="@font/roboto"
             android:text="Start Date:"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -70,14 +82,18 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_marginTop="25dp"
+        android:orientation="horizontal"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
 
 
         <TextView
             android:id="@+id/textView8"
-            android:layout_width="0dp"
+            android:layout_width="43dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:fontFamily="@font/roboto"
             android:text="Description:"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -97,13 +113,17 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
         android:orientation="horizontal">
 
         <TextView
             android:id="@+id/textView9"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
             android:layout_weight="1"
+            android:fontFamily="@font/roboto_black"
+            android:paddingLeft="15dp"
             android:text="Priority:"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -112,21 +132,29 @@
             android:id="@+id/pr"
             android:layout_width="208dp"
             android:layout_height="match_parent"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:paddingRight="15dp" />
 
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp">
 
         <Button
             android:id="@+id/thisIsDone"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
             android:layout_weight="1"
-            android:text="This Is Done!" />
+            android:backgroundTint="#362710"
+            android:fontFamily="@font/roboto_black"
+            android:text="This Is Done!"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#FFFFFF" />
 
 
     </LinearLayout>

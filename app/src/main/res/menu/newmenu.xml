@@ -9,10 +9,4 @@
         android:title="Add"
         android:visible="true" />
 
-    <item
-        android:id="@+id/searchButton"
-        android:icon="@drawable/ic_search_black_24dp"
-        android:title="Search"
-        app:actionViewClass="android.widget.SearchView"
-        app:showAsAction="ifRoom" />
 </menu>
