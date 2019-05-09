@@ -177,7 +177,6 @@ public class TaskAdapter extends ArrayAdapter<Task> {
         }
     };
 
-
     public int getSize() {
         return tasks.size();
     }

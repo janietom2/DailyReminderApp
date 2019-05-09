@@ -107,6 +107,15 @@
             android:gravity="start|top"
             android:inputType="textMultiLine" />
 
+        <ImageButton
+            android:id="@+id/speakNow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="25dp"
+            android:layout_weight="1"
+            android:backgroundTint="#FDE7D5"
+            app:srcCompat="@android:drawable/ic_btn_speak_now" />
+
 
     </LinearLayout>
 

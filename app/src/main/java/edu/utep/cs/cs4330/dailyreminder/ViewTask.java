@@ -2,6 +2,9 @@ package edu.utep.cs.cs4330.dailyreminder;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Intent;
+import android.speech.RecognizerIntent;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +19,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,13 +28,16 @@ import android.widget.Toast;
 import org.w3c.dom.Text;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
 
 import edu.utep.cs.cs4330.dailyreminder.Models.DatabaseHelper;
 import edu.utep.cs.cs4330.dailyreminder.Models.Utilities;
 
 public class ViewTask extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
+    private static final int REQUEST_CODE_SPEECH_INPUT = 1000;
     private Toolbar toolbar;
     private TextView toolbar_title;
     private EditText dueDate;
@@ -41,6 +49,7 @@ public class ViewTask extends AppCompatActivity implements DatePickerDialog.OnDa
     private String taskTitle;
     private String taskId;
     private Button doneButton;
+    private ImageButton mic;
     private int gPr;
 
     @Override
@@ -58,8 +67,10 @@ public class ViewTask extends AppCompatActivity implements DatePickerDialog.OnDa
         this.description = (EditText) findViewById(R.id.description);
         this.pr = (Spinner) findViewById(R.id.pr);
         this.doneButton = (Button) findViewById(R.id.thisIsDone);
+
         TextView theTitle = (TextView) findViewById(R.id.taskName);
 
+        this.mic = (ImageButton) findViewById(R.id.speakNow);
         this.taskTitle = getIntent().getStringExtra("Title");
         String taskDate = getIntent().getStringExtra("end_date");
         String taskStartDate = getIntent().getStringExtra("start_date");
@@ -67,6 +78,22 @@ public class ViewTask extends AppCompatActivity implements DatePickerDialog.OnDa
         int taskpriority = getIntent().getIntExtra("priority", 0);
         int taskfinished = getIntent().getIntExtra("finished", 0);
         this.gPr = taskfinished;
+
+
+        mic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                speak();
+            }
+        });
+
+        if(taskfinished == 1) {
+            this.doneButton.setEnabled(false);
+            this.doneButton.setText("Task is completed");
+        }else{
+            this.doneButton.setText("I have completed this task");
+            this.doneButton.setEnabled(true);
+        }
 
 
         this.taskId = getIntent().getStringExtra("id");
@@ -100,6 +127,35 @@ public class ViewTask extends AppCompatActivity implements DatePickerDialog.OnDa
             }
         });
 
+    }
+
+    private void speak(){
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Say your description");
+
+
+        try{
+            startActivityForResult(intent, REQUEST_CODE_SPEECH_INPUT);
+        }catch (Exception e){
+            Toast.makeText(getBaseContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data){
+        super.onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode){
+            case REQUEST_CODE_SPEECH_INPUT:
+                if(resultCode == RESULT_OK && null != data){
+                    ArrayList<String> text = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    this.description.setText(text.get(0));
+                }
+                break;
+        }
     }
 
     @Override
@@ -155,6 +211,5 @@ public class ViewTask extends AppCompatActivity implements DatePickerDialog.OnDa
         Toast.makeText(getBaseContext(), "Task Done! Good Job!", Toast.LENGTH_LONG).show();
 
     }
-
 
 }
