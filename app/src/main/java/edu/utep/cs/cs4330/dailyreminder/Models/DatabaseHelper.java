@@ -65,7 +65,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COL[3], end_date);
         contentValues.put(COL[4], priority);
         contentValues.put(COL[7], description);
-        contentValues.put(COL[0], finished);
+        contentValues.put(COL[8], finished);
         db.update(TABLE_NAME, contentValues, "t_id = ?", new String[] {id});
         return true;
     }

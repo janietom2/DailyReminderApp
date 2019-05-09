@@ -16,6 +16,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.w3c.dom.Text;
 
@@ -23,16 +24,20 @@ import java.text.DateFormat;
 import java.util.Calendar;
 
 import edu.utep.cs.cs4330.dailyreminder.Models.DatabaseHelper;
+import edu.utep.cs.cs4330.dailyreminder.Models.Utilities;
 
 public class ViewTask extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     private Toolbar toolbar;
     private TextView toolbar_title;
-    private TextView dueDate;
-    private TextView startDate;
+    private EditText dueDate;
+    private EditText startDate;
     private EditText description;
     private Spinner pr;
     private Boolean deadClick = false;
+    private DatabaseHelper db;
+    private String taskTitle;
+    private String taskId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,24 +47,25 @@ public class ViewTask extends AppCompatActivity implements DatePickerDialog.OnDa
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         setContentView(R.layout.activity_view_task);
-        DatabaseHelper db = new DatabaseHelper(this);
+        this.db = new DatabaseHelper(this);
 
-        dueDate = (TextView) findViewById(R.id.dueDate);
-        startDate = (TextView) findViewById(R.id.startDate);
-        description = (EditText) findViewById(R.id.description);
-        pr = (Spinner) findViewById(R.id.pr);
+        this.dueDate = (EditText) findViewById(R.id.dueDate);
+        this.startDate = (EditText) findViewById(R.id.startDate);
+        this.description = (EditText) findViewById(R.id.description);
+        this.pr = (Spinner) findViewById(R.id.pr);
 
-        String taskTitle = getIntent().getStringExtra("Title");
+        this.taskTitle = getIntent().getStringExtra("Title");
         String taskDate = getIntent().getStringExtra("end_date");
         String taskStartDate = getIntent().getStringExtra("start_date");
         String taskdescription = getIntent().getStringExtra("description");
         String taskpriority = getIntent().getStringExtra("priority");
         String taskfinished = getIntent().getStringExtra("finished");
-        String taskId = getIntent().getStringExtra("id");
+        this.taskId = getIntent().getStringExtra("id");
 
-        dueDate.setText(taskDate);
-        startDate.setText(taskStartDate);
-        description.setText(taskdescription);
+        this.dueDate.setText(taskDate);
+        this.startDate.setText(taskStartDate);
+        this.description.setText(taskdescription);
+//        pr.getSelectedItem().toString();
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item,
                 getResources().getStringArray(R.array.prioritynums));
@@ -105,11 +111,11 @@ public class ViewTask extends AppCompatActivity implements DatePickerDialog.OnDa
         String currentTime = DateFormat.getDateInstance(DateFormat.FULL).format(c.getTime());
 
         if(deadClick) {
-            dueDate = (TextView) findViewById(R.id.dueDate);
+            dueDate = (EditText) findViewById(R.id.dueDate);
             dueDate.setText(currentTime);
             this.deadClick = false;
         }else{
-            startDate = (TextView) findViewById(R.id.startDate);
+            startDate = (EditText) findViewById(R.id.startDate);
             startDate.setText(currentTime);
         }
 
@@ -117,6 +123,10 @@ public class ViewTask extends AppCompatActivity implements DatePickerDialog.OnDa
 
     // edit(String id, String name, String description, String start_date, String end_date, String priority, int finished)
     private void editItem(){
+        String npr = String.valueOf(Utilities.priorityConverter(pr.getSelectedItem().toString()));
+        this.db.edit(this.taskId, this.taskTitle, description.getText().toString(), startDate.getText().toString(), dueDate.getText().toString(), npr, 0);
+        Toast.makeText(getBaseContext(), "Saved!", Toast.LENGTH_LONG).show();
+
 
     }
 

@@ -70,13 +70,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // Content View
         setContentView(R.layout.activity_main);
 
-        // Fill List
-//        if(loadFromDB().size() < 1) {
-//            this.tasks = dummyFill(3);
-//        } else{
-//            this.tasks = loadFromDB();
-//        }
-//
         this.tasks = loadFromDB();
 
         // Variables
@@ -136,6 +129,26 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         taskAdapter.setNotifyOnChange(true);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        this.tasks = loadFromDB();
+
+        // Variables
+        ArrayList<Task> tmp   = new ArrayList<Task>();
+        this.filter           = findViewById(R.id.searchFilter);
+
+        // Set visibility of search bar off from the beginning
+        this.filter.setVisibility(View.VISIBLE);
+
+        // Set Tasks Adapter (ListView)
+        this.taskView = findViewById(R.id.items_list);
+        this.taskAdapter = new TaskAdapter(this, tasks);
+        this.taskView.setAdapter(taskAdapter);
+        this.taskView.setTextFilterEnabled(true);
+
+    }
+
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -165,26 +178,26 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return true;
     }
 
-    public ArrayList<Task> dummyFill(int n){
-        ArrayList<Task> tmp = new ArrayList<Task>();
-        Date currentTime = Calendar.getInstance().getTime();
-        Random rand = new Random();
-
-        int counter = 0;
-        int priority = 0;
-        int cut = n / 3;
-
-        for (int i = 0; i < n ; i++) {
-            if (counter > cut){
-                priority++;
-                counter = 0;
-            }
-
-            tmp.add(new Task("Task "+i, "Description "+i, currentTime, currentTime, 1, "3"));
-            counter++;
-        }
-        return tmp;
-    }
+//    public ArrayList<Task> dummyFill(int n){
+//        ArrayList<Task> tmp = new ArrayList<Task>();
+//        Date currentTime = Calendar.getInstance().getTime();
+//        Random rand = new Random();
+//
+//        int counter = 0;
+//        int priority = 0;
+//        int cut = n / 3;
+//
+//        for (int i = 0; i < n ; i++) {
+//            if (counter > cut){
+//                priority++;
+//                counter = 0;
+//            }
+//
+//            tmp.add(new Task("Task "+i, "Description "+i, currentTime, currentTime, 1, "3"));
+//            counter++;
+//        }
+//        return tmp;
+//    }
 
 
     // =========================
@@ -238,13 +251,19 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Calendar calendar = Calendar.getInstance();
         Date today = calendar.getTime();
         db.insertData(name, today, today, Integer.parseInt(priority), "file1", "file2", "Do homework");
-        Task t = new Task(name, "No Description Given Yet!", today, today, Integer.parseInt(priority), db.lastId());
+        Task t = new Task(name, Integer.parseInt(priority), db.lastId());
         this.tasks.add(t);
         this.taskAdapter.addItem(t); // Add to adapter (To be able to filter it)
         this.taskAdapter.notifyDataSetChanged();
     }
 
     private ArrayList<Task> loadFromDB(){
+
+        // Lists
+        ArrayList<Task> red = new ArrayList<Task>(); // h
+        ArrayList<Task> purple = new ArrayList<Task>(); // m
+        ArrayList<Task> blue = new ArrayList<Task>(); // l
+
 
         ArrayList<Task> tks = new ArrayList<Task>();
         Cursor response = db.fetchAllData();
@@ -254,7 +273,22 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
 
         while(response.moveToNext()) {
-            Task tmp = new Task(response.getString(1), Integer.valueOf(response.getString(4)), response.getString(0));
+            Task tmp = new Task(response.getString(1),
+                    response.getString(7),
+                    response.getString(2),
+                    response.getString(3),
+                    Integer.valueOf(response.getString(4)),
+                    response.getString(0),
+                    Integer.valueOf(response.getString(8)));
+
+            if(response.getString(4) == "0"){
+                red.add(tmp);
+            } else if (response.getString(4) == "0"){
+                purple.add(tmp);
+            } else{
+                blue.a
+            }
+
             tks.add(tmp);
         }
 

@@ -26,14 +26,14 @@ public class Task {
         this.finished = 0;
     }
 
-    public Task(String title, String description,Date startDate, Date deadLine, int priority, String id) {
+    public Task(String title, String description, String startDate, String deadLine, int priority, String id, int finished) {
         this.title = title;
         this.description = description;
-        this.deadLine = deadLine.toString();
+        this.deadLine = deadLine;
         this.priority = priority;
-        this.startDate = startDate.toString();
+        this.startDate = startDate;
         this.id = id;
-        this.finished = 0;
+        this.finished = finished;
     }
 
     private int priority;
