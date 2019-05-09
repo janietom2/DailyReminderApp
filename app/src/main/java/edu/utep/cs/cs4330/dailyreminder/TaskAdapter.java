@@ -98,7 +98,10 @@ public class TaskAdapter extends ArrayAdapter<Task> {
         } else if(t.getPriority() == 1) {
             productIcon.setImageResource(R.mipmap.med_important_tag_round);
 
-        }else {
+        }else if(t.getFinished() == 1){
+            productIcon.setImageResource(R.mipmap.done_icon_round);
+        }
+        else {
             productIcon.setImageResource(R.mipmap.low_important_tag_round);
         }
 

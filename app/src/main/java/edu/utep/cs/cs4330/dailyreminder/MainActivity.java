@@ -45,10 +45,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public TaskAdapter taskAdapter;
     private EditText filter;
     private Toolbar toolbar;
+    private Boolean shaked = false;
     DatabaseHelper db;
     ListView taskView;
     Sensor accel;
     SensorManager sm;
+
+    private float acelVal;
+    private float acelLast;
+    private float shake;
 
 
     @Override
@@ -63,6 +68,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         accel = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
         sm.registerListener(this, accel, SensorManager.SENSOR_DELAY_NORMAL);
+
+        acelVal = SensorManager.GRAVITY_EARTH;
+        acelLast = SensorManager.GRAVITY_EARTH;
+        shake = 0.00f;
 
         //DB
         db = new DatabaseHelper(this);
@@ -149,7 +158,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     }
 
-
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.addTask:
@@ -178,28 +186,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         return true;
     }
 
-//    public ArrayList<Task> dummyFill(int n){
-//        ArrayList<Task> tmp = new ArrayList<Task>();
-//        Date currentTime = Calendar.getInstance().getTime();
-//        Random rand = new Random();
-//
-//        int counter = 0;
-//        int priority = 0;
-//        int cut = n / 3;
-//
-//        for (int i = 0; i < n ; i++) {
-//            if (counter > cut){
-//                priority++;
-//                counter = 0;
-//            }
-//
-//            tmp.add(new Task("Task "+i, "Description "+i, currentTime, currentTime, 1, "3"));
-//            counter++;
-//        }
-//        return tmp;
-//    }
-
-
     // =========================
     // Dialogs
     // =========================
@@ -215,6 +201,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         DeleteDialog deleteDialogFragment = new DeleteDialog();
         Bundle args = new Bundle();
         args.putInt("position", position);
+        deleteDialogFragment.setArguments(args);
+        deleteDialogFragment.show(fm, "delete_item");
+    }
+
+    public void showDeleteDialogShake(){
+        FragmentManager fm = getSupportFragmentManager();
+        DeleteDialogShake deleteDialogFragment = new DeleteDialogShake();
+        Bundle args = new Bundle();
         deleteDialogFragment.setArguments(args);
         deleteDialogFragment.show(fm, "delete_item");
     }
@@ -261,9 +255,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private ArrayList<Task> loadFromDB(){
 
         // Lists
-        ArrayList<Task> red = new ArrayList<Task>(); // h
-        ArrayList<Task> purple = new ArrayList<Task>(); // m
-        ArrayList<Task> blue = new ArrayList<Task>(); // l
+        ArrayList<Task> red = new ArrayList<Task>(); // high
+        ArrayList<Task> purple = new ArrayList<Task>(); // medium
+        ArrayList<Task> blue = new ArrayList<Task>(); // low
+        ArrayList<Task> done = new ArrayList<Task>(); // done
 
 
         ArrayList<Task> tks = new ArrayList<Task>();
@@ -282,11 +277,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     response.getString(0),
                     Integer.valueOf(response.getString(8)));
 
-            if(response.getString(4).equals("0")){
-                red.add(tmp);
+            if(response.getString(8).equals("1")){
+                done.add(tmp);
             } else if (response.getString(4).equals("1")){
                 purple.add(tmp);
-            } else{
+            } else if(response.getString(4).equals("0")){
+                red.add(tmp);
+            }else{
                 blue.add(tmp);
             }
         }
@@ -294,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         tks.addAll(red);
         tks.addAll(purple);
         tks.addAll(blue);
+        tks.addAll(done);
 
         return tks;
     }
@@ -306,7 +304,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         this.taskAdapter.removeItem(position);
         taskAdapter.notifyDataSetChanged();
     }
-
 
     private void reSort(){
         this.tasks = loadFromDB();
@@ -325,9 +322,41 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         this.taskView.setTextFilterEnabled(true);
     }
 
+
+    public void deleteDone(){
+        ArrayList<Task> temp = this.tasks;
+        for(int i = 0; i < temp.size(); i++){
+            if(temp.get(i).getFinished() == 1) {
+                db.delete(temp.get(i).getId());
+                this.taskAdapter.removeItem(i);
+                this.tasks.remove(temp.get(i));
+                taskAdapter.notifyDataSetChanged();
+            }
+        }
+        reSort();
+    }
+
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
 //         Toast.makeText(getBaseContext(), "Shake it!! Shake it!!", Toast.LENGTH_LONG).show();
+
+        float x = sensorEvent.values[0];
+        float y = sensorEvent.values[1];
+        float z = sensorEvent.values[2];
+
+        acelLast = acelVal;
+        acelVal = (float) Math.sqrt((double) (x*x + y*y + z*z));
+        float delta = acelVal - acelLast;
+
+        shake = shake * 0.9f + delta;
+
+        if(shake > 12 && !shaked){
+//            this.shaked = true;
+            Toast.makeText(getBaseContext(), "Poof! Completed tasks are gone!", Toast.LENGTH_LONG).show();
+//            showDeleteDialogShake();
+            deleteDone();
+        }
+//        this.shaked = false;
     }
 
     @Override
