@@ -1,15 +1,21 @@
 package edu.utep.cs.cs4330.dailyreminder;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.DatePicker;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import java.text.DateFormat;
+import java.util.Calendar;
 
-public class ViewTask extends AppCompatActivity {
+public class ViewTask extends AppCompatActivity implements DatePickerDialog.OnDateSetListener {
 
     private Toolbar toolbar;
     private TextView toolbar_title;
@@ -20,14 +26,30 @@ public class ViewTask extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_task);
 
-
-//        toolbar_title = (TextView) findViewById(R.id.toolbar_title);
         dueDate = (TextView) findViewById(R.id.dueDate);
 
         String taskTitle = getIntent().getStringExtra("Title");
         String taskDate = getIntent().getStringExtra("Date");
-//        toolbar_title.setText(taskTitle);
         dueDate.setText(taskDate);
+
+        dueDate.setOnClickListener(view -> {
+            DialogFragment datePicker = new DatePickerFragment();
+            datePicker.show(getSupportFragmentManager(), "Date Picker");
+        });
+
+    }
+
+    @Override
+    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.YEAR, year);
+        c.set(Calendar.MONTH, month);
+        c.set(Calendar.DAY_OF_MONTH, day);
+
+        String currentTime = DateFormat.getDateInstance(DateFormat.FULL).format(c.getTime());
+
+        dueDate = (TextView) findViewById(R.id.dueDate);
+        dueDate.setText(currentTime);
 
     }
 

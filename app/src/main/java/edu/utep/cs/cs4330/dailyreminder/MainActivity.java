@@ -1,18 +1,27 @@
 package edu.utep.cs.cs4330.dailyreminder;
 
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.database.Cursor;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.net.Uri;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.support.v7.widget.Toolbar;
@@ -30,7 +39,7 @@ import edu.utep.cs.cs4330.dailyreminder.Models.Task;
 
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
     private ArrayList<Task> tasks;
     public TaskAdapter taskAdapter;
@@ -38,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
     DatabaseHelper db;
     ListView taskView;
+    Sensor accel;
+    SensorManager sm;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,9 +57,12 @@ public class MainActivity extends AppCompatActivity {
         // Toolbar and Full Screen
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
 
+        // Sensor
+        sm = (SensorManager)  getSystemService(SENSOR_SERVICE);
+        accel = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        sm.registerListener(this, accel, SensorManager.SENSOR_DELAY_NORMAL);
 
         //DB
         db = new DatabaseHelper(this);
@@ -56,7 +71,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Fill List
-        this.tasks = dummyFill(3);
+        if(loadFromDB().size() < 1) {
+            this.tasks = dummyFill(3);
+        } else{
+            this.tasks = loadFromDB();
+        }
 
         // Variables
         ArrayList<Task> tmp   = new ArrayList<Task>();
@@ -75,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
         filter.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
@@ -85,9 +103,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-
             }
-
         });
 
         String action = getIntent().getAction();
@@ -104,22 +120,40 @@ public class MainActivity extends AppCompatActivity {
             addDialogFragment.show(fm, "add_item");
         }
 
+        taskView.setOnItemClickListener((arg0, arg1, position, arg3) -> {
+            itemClicked(position);
+        });
 
+        registerForContextMenu(taskView);
+        taskView.setOnCreateContextMenuListener(this);
 
         taskView.setOnItemClickListener((arg0, arg1, position, arg3) -> {
             itemClicked(position);
         });
+        taskAdapter.notifyDataSetChanged();
+        taskAdapter.setNotifyOnChange(true);
     }
 
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.addTask:
-//                Toast.makeText(getBaseContext(), "TBD", Toast.LENGTH_SHORT).show();
                 showAddDialog();
                 return true;
         }
         return false;
+    }
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        int itemPosition = info.position;
+        switch (item.getItemId()) {
+            case R.id.delete_item:
+                showDeleteDialog(itemPosition);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
     }
 
     @Override
@@ -143,36 +177,10 @@ public class MainActivity extends AppCompatActivity {
                 counter = 0;
             }
 
-
             tmp.add(new Task("Task "+i, "Description "+i, currentTime, currentTime, 1, "3"));
             counter++;
         }
-
         return tmp;
-    }
-
-    // =========================
-    // CRUD
-    // =========================
-
-    public void addItem(String name, String priority) {
-        Log.i("numba", priority);
-
-        Calendar calendar = Calendar.getInstance();
-        Date today = calendar.getTime();
-
-
-        //     public boolean insertData(String name, String date_created, String date_end, String priority, String file1, String file2, String description) {
-        db.insertData(name, today, today, Integer.parseInt(priority), "file1", "file2", "Do homework");
-
-        //public Task(String title, String description,Date startDate, Date deadLine, int priority, int id) {
-
-        Task t = new Task(name, "Do Homework", today, today, Integer.parseInt(priority), db.lastId());
-
-
-        this.tasks.add(t);
-        this.taskAdapter.addItem(t); // Add to adapter (To be able to filter it)
-        this.taskAdapter.notifyDataSetChanged();
     }
 
 
@@ -186,6 +194,23 @@ public class MainActivity extends AppCompatActivity {
         addDialogFragment.show(fm, "add_item");
     }
 
+    public void showDeleteDialog(int position){
+        FragmentManager fm = getSupportFragmentManager();
+        DeleteDialog deleteDialogFragment = new DeleteDialog();
+        Bundle args = new Bundle();
+        args.putInt("position", position);
+        deleteDialogFragment.setArguments(args);
+        deleteDialogFragment.show(fm, "delete_item");
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.context_menu, menu);
+    }
+
+
     public void itemClicked(int position){
         Intent taskIntent = new Intent(this, ViewTask.class);
 //        String itemDataAsString = gson.toJson(itm.getList()); // Serialize Object to pass it
@@ -196,4 +221,54 @@ public class MainActivity extends AppCompatActivity {
         startActivity(taskIntent);
     }
 
+    // =========================
+    // CRUD
+    // =========================
+
+    public void addItem(String name, String priority) {
+        Log.i("numba", priority);
+        Calendar calendar = Calendar.getInstance();
+        Date today = calendar.getTime();
+        db.insertData(name, today, today, Integer.parseInt(priority), "file1", "file2", "Do homework");
+        Task t = new Task(name, "Do Homework", today, today, Integer.parseInt(priority), db.lastId());
+        this.tasks.add(t);
+        this.taskAdapter.addItem(t); // Add to adapter (To be able to filter it)
+        this.taskAdapter.notifyDataSetChanged();
+    }
+
+    private ArrayList<Task> loadFromDB(){
+
+        ArrayList<Task> tks = new ArrayList<Task>();
+        Cursor response = db.fetchAllData();
+
+        if(response.getCount() == 0) {
+            Toast.makeText(getBaseContext(), "Add new products", Toast.LENGTH_LONG).show();
+        }
+            while(response.moveToNext()) {
+            Task tmp = new Task(response.getString(1), Integer.valueOf(response.getString(4)), response.getString(0));
+        }
+        return tks;
+    }
+
+    public void DeleteItemDialog(int position){
+        Task t;
+        t = this.tasks.get(position);
+        db.delete(t.getId());
+        this.tasks.remove(t);
+        this.taskAdapter.removeItem(position);
+        taskAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+
+
+         Toast.makeText(getBaseContext(), "Shake it!! Shake it!!", Toast.LENGTH_LONG).show();
+
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
+    }
 }
