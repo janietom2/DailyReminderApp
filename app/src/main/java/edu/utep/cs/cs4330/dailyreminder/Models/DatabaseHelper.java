@@ -12,7 +12,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "tasks.db";
     private static final String TABLE_NAME = "tasks_items";
-    private static final String[] COL = {"t_id", "t_name", "i_date_created", "i_date_end", "i_priority", "t_file_1", "t_file_2", "t_description"};
+    private static final String[] COL = {"t_id", "t_name", "i_date_created", "i_date_end", "i_priority", "t_file_1", "t_file_2", "t_description", "t_finished"};
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -20,7 +20,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create table "+ TABLE_NAME +" (t_id INTEGER PRIMARY KEY AUTOINCREMENT, t_name TEXT, i_date_created TEXT, i_date_end TEXT, i_priority INTEGER, t_file_1 FLOAT,  t_file_2 FLOAT, t_description FLOAT )");
+        db.execSQL("create table "+ TABLE_NAME +" (t_id INTEGER PRIMARY KEY AUTOINCREMENT, t_name TEXT, i_date_created TEXT, i_date_end TEXT, i_priority INTEGER, t_file_1 FLOAT,  t_file_2 FLOAT," +
+                " t_description TEXT, t_finished INTEGER )");
     }
 
     @Override
@@ -39,6 +40,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         contentValues.put(COL[5], file1);
         contentValues.put(COL[6], file2);
         contentValues.put(COL[7], description);
+        contentValues.put(COL[8], 0);
         long result = db.insert(TABLE_NAME, null, contentValues);
         return result != -1;
     }
@@ -54,18 +56,22 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return db.delete(TABLE_NAME, "t_id = ?", new String[] {id});
     }
 
-    private boolean editData(String id, String name, String priority) {
+    private boolean editData(String id, String name, String description, String start_date, String end_date, String priority, int finished) {
         //{"i_id", "i_name", "i_price", "i_weblink", "i_image", "i_newprice"};
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(COL[1], name);
-        contentValues.put(COL[3], priority);
+        contentValues.put(COL[2], start_date);
+        contentValues.put(COL[3], end_date);
+        contentValues.put(COL[4], priority);
+        contentValues.put(COL[7], description);
+        contentValues.put(COL[0], finished);
         db.update(TABLE_NAME, contentValues, "t_id = ?", new String[] {id});
         return true;
     }
 
-    public boolean edit(String id, String name, String link) {
-        return editData(id, name, link);
+    public boolean edit(String id, String name, String description, String start_date, String end_date, String priority, int finished) {
+        return editData(id, name, description, start_date, end_date, priority, finished);
     }
 
     public Cursor fetchAllData(){

@@ -47,12 +47,8 @@ public class AddDialog extends DialogFragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_item);
         priority.setAdapter(adapter);
 
-
-
-
         String url = getArguments() != null ? getArguments().getString("url") : null;
         String tpriority = getArguments() != null ? getArguments().getString("priority") : null;
-
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Add New Task");

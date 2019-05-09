@@ -53,11 +53,11 @@ public class TaskAdapter extends ArrayAdapter<Task> {
         this.tmpTasks.add(t);
     }
 
-    public void editItem(int position, String name, Date url) {
-        Task tmp = this.tmpTasks.get(position);
-        tmp.setTitle(name);
-        tmp.setDeadLine(url);
-    }
+//    public void editItem(int position, String name, Date url) {
+//        Task tmp = this.tmpTasks.get(position);
+//        tmp.setTitle(name);
+//        tmp.setDeadLine(url);
+//    }
 
     public void removeItem(Integer position) {
         Task tmp = this.tmpTasks.get(position);

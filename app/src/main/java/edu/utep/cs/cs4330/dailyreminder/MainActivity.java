@@ -71,11 +71,13 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         setContentView(R.layout.activity_main);
 
         // Fill List
-        if(loadFromDB().size() < 1) {
-            this.tasks = dummyFill(3);
-        } else{
-            this.tasks = loadFromDB();
-        }
+//        if(loadFromDB().size() < 1) {
+//            this.tasks = dummyFill(3);
+//        } else{
+//            this.tasks = loadFromDB();
+//        }
+//
+        this.tasks = loadFromDB();
 
         // Variables
         ArrayList<Task> tmp   = new ArrayList<Task>();
@@ -143,6 +145,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         }
         return false;
     }
+
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
@@ -217,7 +220,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 //        itemIntent.putExtra("position", position);
 //        itemIntent.putExtra("itemDataAsString", itemDataAsString);
         taskIntent.putExtra("Title", tasks.get(position).getTitle());
-        taskIntent.putExtra("Date", tasks.get(position).getDeadLine().toString());
+        taskIntent.putExtra("end_date", tasks.get(position).getDeadLine().toString());
+        taskIntent.putExtra("description", tasks.get(position).getDescription().toString());
+        taskIntent.putExtra("start_date", tasks.get(position).getStartDate().toString());
+        taskIntent.putExtra("priority", tasks.get(position).getPriority());
+        taskIntent.putExtra("finished", tasks.get(position).getFinished());
+        taskIntent.putExtra("id", tasks.get(position).getId());
         startActivity(taskIntent);
     }
 
@@ -230,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Calendar calendar = Calendar.getInstance();
         Date today = calendar.getTime();
         db.insertData(name, today, today, Integer.parseInt(priority), "file1", "file2", "Do homework");
-        Task t = new Task(name, "Do Homework", today, today, Integer.parseInt(priority), db.lastId());
+        Task t = new Task(name, "No Description Given Yet!", today, today, Integer.parseInt(priority), db.lastId());
         this.tasks.add(t);
         this.taskAdapter.addItem(t); // Add to adapter (To be able to filter it)
         this.taskAdapter.notifyDataSetChanged();
@@ -242,11 +250,14 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         Cursor response = db.fetchAllData();
 
         if(response.getCount() == 0) {
-            Toast.makeText(getBaseContext(), "Add new products", Toast.LENGTH_LONG).show();
+            Toast.makeText(getBaseContext(), "Seems you have nothing to do then! Or add a new task!", Toast.LENGTH_LONG).show();
         }
-            while(response.moveToNext()) {
+
+        while(response.moveToNext()) {
             Task tmp = new Task(response.getString(1), Integer.valueOf(response.getString(4)), response.getString(0));
+            tks.add(tmp);
         }
+
         return tks;
     }
 
@@ -261,10 +272,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-
-
-         Toast.makeText(getBaseContext(), "Shake it!! Shake it!!", Toast.LENGTH_LONG).show();
-
+//         Toast.makeText(getBaseContext(), "Shake it!! Shake it!!", Toast.LENGTH_LONG).show();
     }
 
     @Override

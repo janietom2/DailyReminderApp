@@ -7,11 +7,11 @@ public class Task {
 
     private String title;
     private String description;
-    private Date startDate;
+    private String startDate;
     private File[] files;
-    private Date deadLine;
+    private String deadLine;
     private String id;
-    private Boolean finished;
+    private int finished;
 
 
     public Task(String title, int priority, String id){
@@ -19,21 +19,21 @@ public class Task {
 
         this.title = title;
         this.description = "No description given yet";
-        this.deadLine = currentTime;
+        this.deadLine = currentTime.toString();
         this.priority = priority;
-        this.startDate = currentTime;
+        this.startDate = currentTime.toString();
         this.id = id;
-        this.finished = false;
+        this.finished = 0;
     }
 
     public Task(String title, String description,Date startDate, Date deadLine, int priority, String id) {
         this.title = title;
         this.description = description;
-        this.deadLine = deadLine;
+        this.deadLine = deadLine.toString();
         this.priority = priority;
-        this.startDate = startDate;
+        this.startDate = startDate.toString();
         this.id = id;
-        this.finished = false;
+        this.finished = 0;
     }
 
     private int priority;
@@ -54,11 +54,19 @@ public class Task {
         this.description = description;
     }
 
-    public Date getDeadLine() {
+    public void setStartDate(String startDate){
+        this.startDate = startDate;
+    }
+
+    public String getStartDate(){
+        return this.startDate;
+    }
+
+    public String getDeadLine() {
         return deadLine;
     }
 
-    public void setDeadLine(Date deadLine) {
+    public void setDeadLine(String deadLine) {
         this.deadLine = deadLine;
     }
 
@@ -74,11 +82,11 @@ public class Task {
         return this.id;
     }
 
-    public Boolean getFinished(){
+    public int getFinished(){
         return this.finished;
     }
 
-    public void setFinished(Boolean status) {
+    public void setFinished(int status) {
         this.finished = status;
     }
 }
